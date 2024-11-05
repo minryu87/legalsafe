@@ -11,37 +11,51 @@ os.makedirs(LOG_DIR, exist_ok=True)  # Ensure log directory exists
 class AzureGPTClient:
     @staticmethod
     async def generate_response(system_prompt: str, user_prompt: str, 
-                              temperature: Optional[float] = None) -> Optional[str]:
+                            temperature: Optional[float] = None) -> Optional[str]:
         """GPT 응답 생성 및 로깅"""
-        payload = {
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            "temperature": temperature or MODEL_CONFIG["temperature"],
-            "top_p": MODEL_CONFIG["top_p"],
-            "max_tokens": MODEL_CONFIG["max_tokens"]
-        }
-
         try:
             async with aiohttp.ClientSession() as session:
+                payload = {
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    "temperature": temperature or MODEL_CONFIG["temperature"],
+                    "top_p": MODEL_CONFIG["top_p"],
+                    "max_tokens": MODEL_CONFIG["max_tokens"]
+                }
+                
+                # 타임아웃 설정 추가
+                timeout = aiohttp.ClientTimeout(total=60)  # 60초 타임아웃
+                
                 async with session.post(
-                    GPT4V_ENDPOINT, 
-                    headers=HEADERS, 
-                    json=payload, 
-                    timeout=60
+                    GPT4V_ENDPOINT,
+                    headers=HEADERS,
+                    json=payload,
+                    timeout=timeout
                 ) as response:
-                    response.raise_for_status()
-                    response_data = await response.json()
-                    response_text = response_data['choices'][0]['message']['content'].strip()
-                    
-                    # Log the response to file
-                    await AzureGPTClient.log_response(user_prompt, response_text)
-                    return response_text
-        
+                    if response.status == 200:
+                        result = await response.json()
+                        # 응답 구조 로깅
+                        print("API Response structure:", result)
+                        
+                        # 응답에서 텍스트 추출
+                        if "choices" in result and len(result["choices"]) > 0:
+                            response_text = result["choices"][0]["message"]["content"]
+                            return response_text
+                        else:
+                            print("Unexpected response structure:", result)
+                            return None
+                    else:
+                        error_text = await response.text()
+                        print(f"Error status {response.status}: {error_text}")
+                        return None
+                        
+        except asyncio.TimeoutError:
+            print("Request timed out after 60 seconds")
+            return None
         except Exception as e:
-            print(f"Error during GPT request: {e}")
-            await AzureGPTClient.log_response(user_prompt, "No response received", error=True)
+            print(f"Error in generate_response: {str(e)}")
             return None
 
     @staticmethod
