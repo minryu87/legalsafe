@@ -228,7 +228,7 @@ class LegalAnalysisInterface:
             
             # 이벤트 목록 표시
             for i, event in enumerate(st.session_state.timeline_events):
-                col1, col2, col3 = st.columns([2, 5, 1])
+                col1, col2 = st.columns([2, 5])
                 with col1:
                     event_date = st.date_input(
                         f"날짜 {i+1}",
@@ -242,20 +242,16 @@ class LegalAnalysisInterface:
                         value=event.get("event", ""),
                         key=f"event_{i}"
                     )
-                with col3:
-                    st.markdown("&nbsp;")  # 간격 조정
-                    if st.form_submit_button("🗑", key=f"delete_{i}"):
-                        if len(st.session_state.timeline_events) > 1:
-                            st.session_state.timeline_events.pop(i)
-                            st.rerun()
-        # 이벤트 추가 버튼
-            if st.form_submit_button("➕ 사건 추가", key="add_event"):
-                st.session_state.timeline_events.append({"date": None, "event": ""})
-                st.rerun()
 
-            # 저장 및 다음 단계 버튼
-            col_save, col_next = st.columns([1, 1])
-            with col_save:
+            # 이벤트 추가/삭제 및 저장/다음 버튼
+            col1, col2, col3 = st.columns([1, 1, 1])
+            
+            with col1:
+                if st.form_submit_button("➕ 사건 추가"):
+                    st.session_state.timeline_events.append({"date": None, "event": ""})
+                    st.rerun()
+            
+            with col2:
                 if st.form_submit_button("💾 저장"):
                     timeline = [
                         {
@@ -274,8 +270,8 @@ class LegalAnalysisInterface:
                         if case.get('created_at') == st.session_state.case_data.get('created_at'):
                             st.session_state.cases_list[i] = st.session_state.case_data.copy()
                     st.success("저장되었습니다!")
-
-            with col_next:
+            
+            with col3:
                 if st.form_submit_button("다음 단계로 ▶"):
                     timeline = [
                         {
@@ -290,6 +286,12 @@ class LegalAnalysisInterface:
                         "timeline": timeline
                     })
                     st.session_state.current_step = 3
+                    st.rerun()
+
+            # 이벤트 삭제 버튼 (마지막 이벤트만 삭제 가능)
+            if len(st.session_state.timeline_events) > 1:
+                if st.form_submit_button("🗑 마지막 사건 삭제"):
+                    st.session_state.timeline_events.pop()
                     st.rerun()
 
     def show_legal_issues_form(self):
