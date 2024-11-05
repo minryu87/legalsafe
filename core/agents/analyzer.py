@@ -38,7 +38,7 @@ class CaseAnalyzer(BaseAgent):
                 for event in timeline
             ])
         
-        return f"""다음 사건을 분석해주세요:
+        return f"""다음 사건을 분석해주세요(한글로 제공하세요):
                     사건 종류: {case_type}
                     사건 개요:
                     {case_summary}

@@ -12,7 +12,7 @@ class LegalStrategist(BaseAgent):
         return """당신은 법률 전략 수립 전문가입니다.
         사건 분석과 판례 연구 결과를 바탕으로 효과적인 법적 전략을 수립하는 것이 주요 업무입니다.
 
-        다음 사항들을 중점적으로 고려하여 전략을 수립해주세요:
+        다음 사항들을 중점적으로 고려하여 전략을 수립해주세요(한글로 제공하세요):
         1. 승소 가능성 극대화를 위한 주장 구성
         2. 예상되는 상대방 주장에 대한 대응 방안
         3. 증거 수집 및 제출 전략
@@ -40,23 +40,23 @@ class LegalStrategist(BaseAgent):
         existing_evidence = "\n".join(evidence_status.get('existing_evidence', []))
         potential_evidence = "\n".join(evidence_status.get('potential_evidence', []))
 
-        return f"""다음 분석 결과를 바탕으로 법적 전략을 수립해주세요:
+        return f"""다음 분석 결과를 바탕으로 법적 전략을 수립해주세요(한글로 제공하세요):
 
-주요 법적 쟁점:
-{legal_issues}
+                    주요 법적 쟁점:
+                    {legal_issues}
 
-현재 확보한 증거:
-{existing_evidence}
+                    현재 확보한 증거:
+                    {existing_evidence}
 
-향후 확보 가능한 증거:
-{potential_evidence}
+                    향후 확보 가능한 증거:
+                    {potential_evidence}
 
-다음 항목들에 대한 전략을 수립해주세요:
-1. 각 쟁점별 주장 전개 방안
-2. 증거 수집 및 제출 전략
-3. 예상되는 상대방 주장과 대응 방안
-4. 소송 진행 단계별 전략
-5. 예상되는 위험요소와 대비책"""
+                    다음 항목들에 대한 전략을 수립해주세요:
+                    1. 각 쟁점별 주장 전개 방안
+                    2. 증거 수집 및 제출 전략
+                    3. 예상되는 상대방 주장과 대응 방안
+                    4. 소송 진행 단계별 전략
+                    5. 예상되는 위험요소와 대비책"""
 
     def get_output_format(self) -> Dict:
         return {

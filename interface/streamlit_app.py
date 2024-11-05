@@ -462,6 +462,9 @@ class LegalAnalysisInterface:
                 status_container = st.empty()
                 progress_bar = st.progress(0)
                 
+                # GPT 클라이언트 초기화
+                client = AzureGPTClient()
+                
                 # 분석 단계별 진행 상태
                 stages = [
                     ("에이전트 초기화 중...", 10),
@@ -471,17 +474,30 @@ class LegalAnalysisInterface:
                     ("전략 수립 중...", 90),
                     ("최종 보고서 작성 중...", 100)
                 ]
-                
-                # GPT 클라이언트 초기화
-                client = AzureGPTClient()
+
+                results_container = st.container()
                 
                 for stage, progress in stages:
                     status_container.info(f"진행 중: {stage}")
                     progress_bar.progress(progress)
                     
                     # GPT 응답 생성 및 표시
-                    system_prompt = "You are a legal analysis assistant."
-                    user_prompt = f"Current stage: {stage}\nPlease analyze the following case data:\n{json.dumps(st.session_state.case_data, indent=2)}"
+                    system_prompt = """당신은 법률 분석 전문가입니다. 
+                    한국어로 응답해주세요.
+                    전문적인 법률 용어를 사용하되, 일반인도 이해할 수 있도록 설명해주세요."""
+                    
+                    user_prompt = f"""현재 단계: {stage}
+                    다음 사건 데이터를 분석해주세요:
+                    {json.dumps(st.session_state.case_data, ensure_ascii=False, indent=2)}
+                    
+                    단계별 지침:
+                    - 사실관계 분석: 핵심 사실관계를 시간순으로 정리하고 중요 쟁점 도출
+                    - 법률 검토: 관련 법령과 각 쟁점별 법적 해석 제시
+                    - 판례 검색: 유사 판례를 찾아 시사점 도출
+                    - 전략 수립: 법적 대응 방향과 구체적인 전략 제시
+                    - 최종 보고서: 전체 분석 내용을 체계적으로 정리
+                    
+                    현재 단계에 맞는 분석을 제공해주세요."""
                     
                     response = asyncio.run(client.generate_response(
                         system_prompt=system_prompt,
@@ -489,22 +505,27 @@ class LegalAnalysisInterface:
                     ))
                     
                     if response:
-                        st.markdown(f"**{stage}** 결과:\n{response}")
+                        with results_container:
+                            st.markdown(f"**{stage.replace('중...', '')} 결과:**\n{response}")
                     else:
-                        st.warning(f"{stage} - GPT 응답을 받지 못했습니다.")
+                        with results_container:
+                            st.warning(f"{stage} - GPT 응답을 받지 못했습니다.")
                     
-                    time.sleep(1)  # 진행 상태를 볼 수 있도록 약간의 딜레이
+                    time.sleep(1)
                 
-                st.success("분석이 완료되었습니다!")
-                st.session_state.current_step = 0  # 목록 화면으로 이동
-                
-                # 상태 업데이트
+                # 분석 완료 후 상태 업데이트
                 for i, case in enumerate(st.session_state.cases_list):
                     if case.get('created_at') == st.session_state.case_data.get('created_at'):
                         st.session_state.cases_list[i]['status'] = '분석완료'
                 
-                st.rerun()
+                # 완료 메시지 표시
+                st.success("분석이 완료되었습니다!")
                 
+                # 목록으로 돌아가기 버튼 추가
+                if st.button("📋 목록으로 돌아가기"):
+                    st.session_state.current_step = 0
+                    st.rerun()
+                    
             except Exception as e:
                 st.error(f"분석 중 오류가 발생했습니다: {str(e)}")
                 st.text("상세 오류 정보:")
