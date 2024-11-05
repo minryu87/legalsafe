@@ -11,6 +11,19 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.azure_config import MODEL_CONFIG
 from core.utils.azure_gpt import AzureGPTClient
 
+from datetime import datetime
+import pandas as pd
+from typing import Dict, List, Optional
+import json
+import sys
+import os
+import asyncio
+import time
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config.azure_config import MODEL_CONFIG
+from core.utils.azure_gpt import AzureGPTClient
+from core.utils.storage import load_cases, save_cases
+
 class LegalAnalysisInterface:
     def __init__(self):
         self.initialize_session_state()
@@ -22,7 +35,7 @@ class LegalAnalysisInterface:
         if 'case_data' not in st.session_state:
             st.session_state.case_data = {}
         if 'cases_list' not in st.session_state:
-            st.session_state.cases_list = []
+            st.session_state.cases_list = load_cases()  # 저장된 케이스 로드
         if 'timeline_events' not in st.session_state:
             st.session_state.timeline_events = [{"date": None, "event": ""}]
         if 'legal_issues' not in st.session_state:
@@ -54,11 +67,35 @@ class LegalAnalysisInterface:
             elif st.session_state.current_step == 5:
                 self.show_final_confirmation()
 
+    def save_current_case(self):
+            """현재 케이스 저장"""
+            if not st.session_state.case_data:
+                return
+                
+            # 생성일시가 없는 경우 추가
+            if 'created_at' not in st.session_state.case_data:
+                st.session_state.case_data['created_at'] = datetime.now().isoformat()
+                
+            # 기존 케이스 업데이트 또는 새 케이스 추가
+            found = False
+            for i, case in enumerate(st.session_state.cases_list):
+                if case.get('created_at') == st.session_state.case_data.get('created_at'):
+                    st.session_state.cases_list[i] = st.session_state.case_data.copy()
+                    found = True
+                    break
+                    
+            if not found:
+                st.session_state.cases_list.append(st.session_state.case_data.copy())
+                
+            # 파일에 저장
+            save_cases(st.session_state.cases_list)
+            st.success("케이스가 저장되었습니다!")
+
     def show_cases_list(self):
         """케이스 목록 화면"""
         # 신규 분석 버튼
         if st.button("➕ 신규 분석하기"):
-            st.session_state.case_data = {}  # 데이터 초기화
+            st.session_state.case_data = {}
             st.session_state.current_step = 1
             st.rerun()
         
@@ -79,23 +116,16 @@ class LegalAnalysisInterface:
             ])
             
             # 선택 가능한 테이블로 표시
-            selected_indices = st.dataframe(
-                cases_df,
-                column_config={
-                    "생성일시": st.column_config.DatetimeColumn(
-                        "생성일시",
-                        format="YYYY-MM-DD HH:mm"
-                    )
-                },
-                hide_index=False
+            selected_idx = st.selectbox(
+                "분석 케이스 선택",
+                range(len(cases_df)),
+                format_func=lambda x: f"{cases_df.iloc[x]['생성일시']} - {cases_df.iloc[x]['사건종류']} ({cases_df.iloc[x]['당사자정보']})"
             )
             
-            # 선택된 케이스 불러오기
             if st.button("선택한 케이스 불러오기"):
-                if selected_indices is not None:
-                    st.session_state.case_data = st.session_state.cases_list[selected_indices]
-                    st.session_state.current_step = 1
-                    st.rerun()
+                st.session_state.case_data = st.session_state.cases_list[selected_idx].copy()
+                st.session_state.current_step = 1
+                st.rerun()
 
     def get_step_description(self, step: int) -> str:
         """단계별 설명 반환"""
@@ -178,10 +208,9 @@ class LegalAnalysisInterface:
                                 "role": opposing_role,
                                 "brief": opposing_brief
                             }
-                        },
-                        "created_at": datetime.now().isoformat(),
-                        "status": "작성중"
+                        }
                     })
+                    self.save_current_case()
                     # 저장된 케이스 목록에 추가
                     if st.session_state.case_data not in st.session_state.cases_list:
                         st.session_state.cases_list.append(st.session_state.case_data.copy())
@@ -448,24 +477,11 @@ class LegalAnalysisInterface:
         st.header("5. 최종 확인")
         
         # 이전 버튼
-        if st.button("◀ 이전으로", key="prev_final"):
-            st.session_state.current_step = 4
-            st.rerun()
-        
-        # 입력된 정보 표시
-        st.json(st.session_state.case_data)
-        
-        # 분석 시작 버튼
         if st.button("🔍 분석 시작"):
             try:
-                # 진행 상태를 보여줄 컨테이너
                 status_container = st.empty()
                 progress_bar = st.progress(0)
                 
-                # GPT 클라이언트 초기화
-                client = AzureGPTClient()
-                
-                # 분석 단계별 진행 상태
                 stages = [
                     ("에이전트 초기화 중...", 10),
                     ("사실관계 분석 중...", 30),
@@ -474,30 +490,43 @@ class LegalAnalysisInterface:
                     ("전략 수립 중...", 90),
                     ("최종 보고서 작성 중...", 100)
                 ]
-
-                results_container = st.container()
+                
+                client = AzureGPTClient()
                 
                 for stage, progress in stages:
                     status_container.info(f"진행 중: {stage}")
                     progress_bar.progress(progress)
                     
-                    # GPT 응답 생성 및 표시
-                    system_prompt = """당신은 법률 분석 전문가입니다. 
-                    한국어로 응답해주세요.
-                    전문적인 법률 용어를 사용하되, 일반인도 이해할 수 있도록 설명해주세요."""
+                    # 판례 검색 단계일 때 특별한 프롬프트 사용
+                    if "판례 검색" in stage:
+                        system_prompt = """당신은 대한민국의 법률 전문가이며 판례 연구원입니다.
+                        실제 존재하는 대법원 및 하급심 판례만을 인용해야 합니다.
+                        판례번호는 반드시 실제 존재하는 판례번호를 정확하게 기재해야 합니다.
+                        응답은 다음 구조를 반드시 포함해야 합니다:
+                        1. 관련된 주요 판례들의 요지 (판례번호 포함)
+                        2. 판례에서 나타난 법원의 판단 기준
+                        3. 본 사건과의 유사점과 차이점
+                        4. 예상되는 법원의 판단 방향
+                        5. 특별히 참고해야 할 법리나 판시사항"""
+
+                        user_prompt = f"""다음 사건의 관련 판례를 검색하여 분석해주세요:
+                        사건 종류: {st.session_state.case_data.get('case_type')}
+                        사실관계: {st.session_state.case_data.get('case_summary')}
+                        법적 쟁점: {json.dumps(st.session_state.case_data.get('legal_issues'), ensure_ascii=False, indent=2)}
+                        
+                        실제 존재하는 판례만을 인용하되, 최근 10년 이내의 판례를 우선적으로 검토해주세요.
+                        각 판례의 판례번호를 정확히 기재해주세요."""
                     
-                    user_prompt = f"""현재 단계: {stage}
-                    다음 사건 데이터를 분석해주세요:
-                    {json.dumps(st.session_state.case_data, ensure_ascii=False, indent=2)}
-                    
-                    단계별 지침:
-                    - 사실관계 분석: 핵심 사실관계를 시간순으로 정리하고 중요 쟁점 도출
-                    - 법률 검토: 관련 법령과 각 쟁점별 법적 해석 제시
-                    - 판례 검색: 유사 판례를 찾아 시사점 도출
-                    - 전략 수립: 법적 대응 방향과 구체적인 전략 제시
-                    - 최종 보고서: 전체 분석 내용을 체계적으로 정리
-                    
-                    현재 단계에 맞는 분석을 제공해주세요."""
+                    else:
+                        # 기존 프롬프트 사용
+                        system_prompt = """당신은 법률 분석 전문가입니다. 
+                        한국어로 응답해주세요.
+                        전문적인 법률 용어를 사용하되, 일반인도 이해할 수 있도록 설명해주세요."""
+                        
+                        user_prompt = f"""현재 단계: {stage}
+                        다음 사건 데이터를 분석해주세요:
+                        {json.dumps(st.session_state.case_data, ensure_ascii=False, indent=2)}
+                        """
                     
                     response = asyncio.run(client.generate_response(
                         system_prompt=system_prompt,
@@ -505,11 +534,9 @@ class LegalAnalysisInterface:
                     ))
                     
                     if response:
-                        with results_container:
-                            st.markdown(f"**{stage.replace('중...', '')} 결과:**\n{response}")
+                        st.markdown(f"**{stage.replace('중...', '')} 결과:**\n{response}")
                     else:
-                        with results_container:
-                            st.warning(f"{stage} - GPT 응답을 받지 못했습니다.")
+                        st.warning(f"{stage} - GPT 응답을 받지 못했습니다.")
                     
                     time.sleep(1)
                 
