@@ -259,15 +259,19 @@ class LegalAnalysisInterface:
             for i, event in enumerate(st.session_state.timeline_events):
                 col1, col2 = st.columns([2, 5])
                 with col1:
-                    # 첫 번째 이벤트는 오늘 날짜, 이후 이벤트는 이전 이벤트의 날짜를 기본값으로 설정
-                    default_date = (
-                        datetime.now().date() if i == 0 and not event.get("date")
-                        else (
-                            datetime.strptime(st.session_state.timeline_events[i-1].get("date", datetime.now().strftime("%Y-%m-%d")), "%Y-%m-%d").date()
-                            if i > 0
-                            else datetime.strptime(event.get("date", datetime.now().strftime("%Y-%m-%d")), "%Y-%m-%d").date()
-                        )
-                    )
+                    # 기본 날짜 설정 로직
+                    if i == 0:
+                        default_date = datetime.now().date()
+                    else:
+                        try:
+                            prev_date_str = st.session_state.timeline_events[i-1].get("date")
+                            if prev_date_str:
+                                default_date = datetime.strptime(prev_date_str, "%Y-%m-%d").date()
+                            else:
+                                default_date = datetime.now().date()
+                        except:
+                            default_date = datetime.now().date()
+
                     event_date = st.date_input(
                         f"날짜 {i+1}",
                         value=default_date,
