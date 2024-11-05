@@ -1,0 +1,23 @@
+Prompt:
+다음 사건을 분석해주세요:
+                    사건 종류: 민사
+                    사건 개요:
+                    
+            계약 위반 및 손해배상 청구 사건
+            원고 A회사는 피고 B회사에 소프트웨어 개발을 의뢰하였으나,
+            피고는 계약상 정해진 기한 내에 개발을 완료하지 못했으며,
+            제공된 소프트웨어에도 심각한 하자가 있었음.
+            이에 원고는 계약 위반에 따른 손해배상을 청구함.
+            
+                    사건 경위:
+                    타임라인 정보 없음
+                    다음 항목들을 분석해주세요:
+                    1. 사건의 핵심 쟁점
+                    2. 관련 법령
+                    3. 입증이 필요한 주요 사실
+                    4. 법적 분석 및 검토 의견
+출력 형식은 다음과 같아야 합니다:
+{"key_issues": [{"issue": "string", "description": "string", "relevant_laws": ["string"], "required_evidence": ["string"]}], "legal_analysis": {"main_points": ["string"], "potential_challenges": ["string"], "recommended_focus": "string"}, "evidence_requirements": {"critical_facts": ["string"], "suggested_evidence": ["string"], "potential_difficulties": ["string"]}, "initial_opinion": {"strengths": ["string"], "weaknesses": ["string"], "key_considerations": ["string"]}}
+
+Response:
+{"key_issues": [{"issue": "계약 위반", "description": "피고 B회사가 소프트웨어 개발 계약을 이행하지 못한 점", "relevant_laws": ["민법 제390조 (채무불이행과 손해배상)"], "required_evidence": ["계약서 내용", "개발 기한 및 완료 여부에 대한 증거"]}, {"issue": "소프트웨어 하자", "description": "제공된 소프트웨어에 심각한 하자가 있는 점", "relevant_laws": ["민법 제623조 (임대차의 목적물 하자)"], "required_evidence": ["소프트웨어 하자에 대한 기술적 검토 보고서", "사용자 불만 사항, 오류 기록"]}], "legal_analysis": {"main_points": ["피고가 계약서에 명시된 기한 내 소프트웨어를 완성하지 못한 점", "완성된 소프트웨어에 심각한 하자가 있는 점", "이로 인해 원고가 입은 손해에 대한 배상"], "potential_challenges": ["계약서에 명시된 기한의 명확성 여부", "소프트웨어 하자의 정도 및 원인에 대한 입증"], "recommended_focus": "계약서의 기한 및 조건을 명확히 하고, 소프트웨어 하자에 대한 객관적인 증거를 확보하는 것"}, "evidence_requirements": {"critical_facts": ["계약서에 명시된 개발 기한 및 조건", "소프트웨어 하자와 그로 인한 손해"], "suggested_evidence": ["계약서 사본", "개발 진행 상황에 대한 기록", "소프트웨어 하자에 대한 기술 검토 보고서", "손해를 입증할 수 있는 재무 자료"], "potential_difficulties": ["개발 기한의 명확성 입증", "소프트웨어 하자에 대한 객관적인 기술적 검토"]}, "initial_opinion": {"strengths": ["계약서에 명시된 기한 및 조건이 명확할 경우 원고의 주장이 강력할 것", "소프트웨어 하자에 대한 기술적 검토 보고서가 객관적일 경우"], "weaknesses": ["개발 기한의 명확성에 대한 논란", "소프트웨어 하자의 원인 및 정도에 대한 입증"], "key_considerations": ["계약서의 기한 및 조건을 명확히 하고, 기술적 검토 보고서를 통한 하자 입증"]}}

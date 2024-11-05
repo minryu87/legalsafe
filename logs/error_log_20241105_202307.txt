@@ -1,0 +1,23 @@
+Prompt:
+다음 사건을 분석해주세요:
+                    사건 종류: 민사
+                    사건 개요:
+                    
+            계약 위반 및 손해배상 청구 사건
+            원고 A회사는 피고 B회사에 소프트웨어 개발을 의뢰하였으나,
+            피고는 계약상 정해진 기한 내에 개발을 완료하지 못했으며,
+            제공된 소프트웨어에도 심각한 하자가 있었음.
+            이에 원고는 계약 위반에 따른 손해배상을 청구함.
+            
+                    사건 경위:
+                    
+                    다음 항목들을 분석해주세요:
+                    1. 사건의 핵심 쟁점
+                    2. 관련 법령
+                    3. 입증이 필요한 주요 사실
+                    4. 법적 분석 및 검토 의견
+출력 형식은 다음과 같아야 합니다:
+{"key_issues": [{"issue": "string", "description": "string", "relevant_laws": ["string"], "required_evidence": ["string"]}], "legal_analysis": {"main_points": ["string"], "potential_challenges": ["string"], "recommended_focus": "string"}, "evidence_requirements": {"critical_facts": ["string"], "suggested_evidence": ["string"], "potential_difficulties": ["string"]}, "initial_opinion": {"strengths": ["string"], "weaknesses": ["string"], "key_considerations": ["string"]}}
+
+Response:
+No response received

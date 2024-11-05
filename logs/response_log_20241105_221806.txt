@@ -1,0 +1,90 @@
+Prompt:
+다음 사건을 분석해주세요:
+                    사건 종류: 민사
+                    사건 개요:
+                    
+            계약 위반 및 손해배상 청구 사건
+            원고 A회사는 피고 B회사에 소프트웨어 개발을 의뢰하였으나,
+            피고는 계약상 정해진 기한 내에 개발을 완료하지 못했으며,
+            제공된 소프트웨어에도 심각한 하자가 있었음.
+            이에 원고는 계약 위반에 따른 손해배상을 청구함.
+            
+                    사건 경위:
+                    타임라인 정보 없음
+                    다음 항목들을 분석해주세요:
+                    1. 사건의 핵심 쟁점
+                    2. 관련 법령
+                    3. 입증이 필요한 주요 사실
+                    4. 법적 분석 및 검토 의견
+출력 형식은 다음과 같아야 합니다:
+{"key_issues": [{"issue": "string", "description": "string", "relevant_laws": ["string"], "required_evidence": ["string"]}], "legal_analysis": {"main_points": ["string"], "potential_challenges": ["string"], "recommended_focus": "string"}, "evidence_requirements": {"critical_facts": ["string"], "suggested_evidence": ["string"], "potential_difficulties": ["string"]}, "initial_opinion": {"strengths": ["string"], "weaknesses": ["string"], "key_considerations": ["string"]}}
+
+Response:
+{
+  "key_issues": [
+    {
+      "issue": "계약 위반",
+      "description": "피고 B회사가 계약상 정해진 기한 내에 소프트웨어 개발을 완료하지 못함.",
+      "relevant_laws": ["민법 제389조 (채무불이행)"],
+      "required_evidence": ["계약서", "소프트웨어 개발 완료 시점 관련 문서"]
+    },
+    {
+      "issue": "손해배상",
+      "description": "계약 위반으로 인해 원고 A회사에 발생한 손해에 대한 배상 청구.",
+      "relevant_laws": ["민법 제750조 (불법행위로 인한 손해배상)", "민법 제390조 (채무불이행으로 인한 손해배상)"],
+      "required_evidence": ["손해 발생을 입증할 수 있는 문서", "손해의 금액을 입증할 수 있는 자료"]
+    },
+    {
+      "issue": "소프트웨어의 하자",
+      "description": "제공된 소프트웨어에 심각한 하자가 있음.",
+      "relevant_laws": ["민법 제580조 (하자담보책임)", "민법 제681조 (도급인의 담보책임)"],
+      "required_evidence": ["소프트웨어 하자를 입증할 수 있는 기술적 보고서", "하자 관련 사용자 불만 또는 문제 보고서"]
+    }
+  ],
+  "legal_analysis": {
+    "main_points": [
+      "계약서 내용 및 계약 위반 여부",
+      "소프트웨어 개발 완료 시점 및 지연 여부",
+      "소프트웨어 하자 여부 및 그로 인한 손해 발생 여부"
+    ],
+    "potential_challenges": [
+      "계약서 내용의 해석 문제",
+      "소프트웨어 개발 지연의 원인 및 책임 소재",
+      "하자의 심각성 및 그로 인한 손해 입증"
+    ],
+    "recommended_focus": "계약서의 명확한 해석 및 소프트웨어 하자와 손해의 직접적 인과관계 입증"
+  },
+  "evidence_requirements": {
+    "critical_facts": [
+      "계약서의 내용 및 조건",
+      "소프트웨어 개발 완료 시점",
+      "소프트웨어의 하자 여부",
+      "하자로 인한 손해의 발생 및 그 금액"
+    ],
+    "suggested_evidence": [
+      "계약서 원본 및 사본",
+      "개발 완료 및 지연 관련 문서",
+      "소프트웨어 하자에 대한 기술적 보고서",
+      "손해 발생을 입증할 수 있는 회계 자료 및 손해 산정 보고서"
+    ],
+    "potential_difficulties": [
+      "계약서 해석의 모호성",
+      "개발 지연의 원인 규명 및 책임 소재 파악",
+      "하자의 심각성 및 손해 발생의 직접적 인과관계 입증"
+    ]
+  },
+  "initial_opinion": {
+    "strengths": [
+      "계약서에 명시된 조건이 명확하다면 계약 위반 입증이 용이함",
+      "소프트웨어 하자에 대한 기술적 보고서가 있다면 하자 입증이 가능함"
+    ],
+    "weaknesses": [
+      "계약서 내용이 모호할 경우 계약 위반 입증이 어려울 수 있음",
+      "손해 발생의 직접적 인과관계를 입증하는데 어려움이 있을 수 있음"
+    ],
+    "key_considerations": [
+      "계약서의 명확한 해석 및 소프트웨어 하자 여부를 입증할 수 있는 기술적 증거 확보",
+      "손해의 발생 및 그 금액을 입증할 수 있는 회계 자료 및 손해 산정 보고서 확보"
+    ]
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "generated_at": "2024-11-05T22:45:56.595249",
+    "version": "1.0.0",
+    "report_format": "detailed"
+  },
+  "sections": {
+    "executive_summary": {
+      "case_overview": {
+        "type": null,
+        "key_issues": [],
+        "summary": null
+      },
+      "key_findings": {
+        "main_points": [],
+        "success_factors": [],
+        "risk_factors": []
+      },
+      "strategic_direction": {
+        "recommended_approach": "",
+        "critical_next_steps": []
+      },
+      "success_probability": {
+        "overall_assessment": 0.0,
+        "key_factors": []
+      }
+    },
+    "case_analysis": {
+      "legal_issues": [],
+      "factual_analysis": {
+        "key_facts": [],
+        "disputed_facts": [],
+        "timeline": []
+      },
+      "legal_framework": {
+        "applicable_laws": [],
+        "key_legal_principles": []
+      },
+      "preliminary_assessment": {
+        "strengths": [],
+        "weaknesses": [],
+        "uncertainties": []
+      }
+    },
+    "precedent_review": {
+      "key_precedents": [],
+      "legal_principles": {
+        "established_principles": [],
+        "relevant_interpretations": []
+      },
+      "comparative_analysis": {
+        "similarities": [],
+        "differences": [],
+        "implications": []
+      }
+    },
+    "strategy_recommendations": {
+      "overall_strategy": {
+        "main_approach": "",
+        "key_objectives": [],
+        "success_metrics": []
+      },
+      "tactical_recommendations": {
+        "immediate_actions": [],
+        "medium_term_actions": [],
+        "long_term_considerations": []
+      },
+      "counter_strategy": {
+        "anticipated_opposition": [],
+        "proposed_responses": []
+      }
+    },
+    "risk_analysis": {
+      "legal_risks": [],
+      "procedural_risks": []
+    },
+    "evidence_plan": {
+      "existing_evidence": [],
+      "required_evidence": [],
+      "collection_strategy": {
+        "priorities": [],
+        "methods": [],
+        "challenges": []
+      },
+      "presentation_plan": {
+        "sequence": [],
+        "key_points": [],
+        "strategy": ""
+      }
+    },
+    "timeline": {
+      "procedural_timeline": [],
+      "evidence_collection_timeline": [],
+      "strategic_action_timeline": [],
+      "key_deadlines": []
+    },
+    "appendices": {
+      "detailed_precedent_summaries": [],
+      "legal_references": [],
+      "evidence_details": {
+        "available_evidence": [],
+        "required_evidence": [],
+        "potential_challenges": []
+      },
+      "analysis_methodology": {
+        "analysis_approach": "법률 전문가 시스템을 통한 체계적 분석",
+        "methodology_steps": [
+          "사례 분석 및 쟁점 도출",
+          "관련 법령 및 판례 검토",
+          "증거 분석 및 평가",
+          "전략 수립 및 권고사항 도출"
+        ],
+        "tools_used": [
+          "법률 분석 AI 시스템",
+          "판례 데이터베이스",
+          "증거 평가 프레임워크"
+        ]
+      }
+    },
+    "conclusions": {
+      "main_conclusions": [],
+      "recommendations": [],
+      "next_steps": []
+    }
+  }
+}

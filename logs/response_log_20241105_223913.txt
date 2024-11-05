@@ -1,0 +1,91 @@
+Prompt:
+다음 사건을 분석해주세요:
+                    사건 종류: 민사
+                    사건 개요:
+                    
+            계약 위반 및 손해배상 청구 사건
+            원고 A회사는 피고 B회사에 소프트웨어 개발을 의뢰하였으나,
+            피고는 계약상 정해진 기한 내에 개발을 완료하지 못했으며,
+            제공된 소프트웨어에도 심각한 하자가 있었음.
+            이에 원고는 계약 위반에 따른 손해배상을 청구함.
+            
+                    사건 경위:
+                    타임라인 정보 없음
+                    다음 항목들을 분석해주세요:
+                    1. 사건의 핵심 쟁점
+                    2. 관련 법령
+                    3. 입증이 필요한 주요 사실
+                    4. 법적 분석 및 검토 의견
+출력 형식은 다음과 같아야 합니다:
+{"key_issues": [{"issue": "string", "description": "string", "relevant_laws": ["string"], "required_evidence": ["string"]}], "legal_analysis": {"main_points": ["string"], "potential_challenges": ["string"], "recommended_focus": "string"}, "evidence_requirements": {"critical_facts": ["string"], "suggested_evidence": ["string"], "potential_difficulties": ["string"]}, "initial_opinion": {"strengths": ["string"], "weaknesses": ["string"], "key_considerations": ["string"]}}
+
+Response:
+{
+    "key_issues": [
+        {
+            "issue": "계약 위반",
+            "description": "피고 B회사가 계약상 정해진 기한 내에 소프트웨어 개발을 완료하지 못함",
+            "relevant_laws": ["민법 제390조(채무불이행과 손해배상)", "민법 제395조(이행 지체로 인한 손해배상)"],
+            "required_evidence": ["계약서", "프로젝트 일정표", "개발 완료 보고서"]
+        },
+        {
+            "issue": "제공된 소프트웨어의 하자",
+            "description": "피고가 제공한 소프트웨어에 심각한 하자가 있음",
+            "relevant_laws": ["민법 제623조(하자담보책임)"],
+            "required_evidence": ["소프트웨어 테스트 보고서", "고객 불만 기록", "전문가 감정서"]
+        },
+        {
+            "issue": "손해배상 청구",
+            "description": "계약 위반 및 하자로 인해 원고 A회사가 입은 손해에 대한 배상 청구",
+            "relevant_laws": ["민법 제750조(불법행위로 인한 손해배상)"],
+            "required_evidence": ["손해액 산정 자료", "손해 발생 증거"]
+        }
+    ],
+    "legal_analysis": {
+        "main_points": [
+            "계약서에 명시된 개발 완료 기한과 실제 완료 기한을 비교하여 피고의 계약 위반 여부를 확인",
+            "소프트웨어의 하자를 입증하기 위한 전문가 감정서 확보",
+            "원고가 주장하는 손해액이 실제로 발생했는지 입증"
+        ],
+        "potential_challenges": [
+            "개발 완료 기한이 연장되었거나, 양측이 합의한 경우",
+            "소프트웨어 하자가 원고의 사용 방식이나 외부 요인에 의한 것인지 여부",
+            "손해액 산정의 정확성"
+        ],
+        "recommended_focus": "계약서 조항과 실제 이행 내역을 명확히 비교하고, 소프트웨어 하자에 대한 객관적인 감정을 통해 피고의 책임을 명확히 할 필요가 있음"
+    },
+    "evidence_requirements": {
+        "critical_facts": [
+            "계약서에 명시된 개발 완료 기한",
+            "실제 소프트웨어 개발 완료 시점",
+            "소프트웨어의 하자 존재 여부",
+            "원고가 입은 손해액"
+        ],
+        "suggested_evidence": [
+            "계약서 및 부속 문서",
+            "프로젝트 일정표 및 개발 완료 보고서",
+            "소프트웨어 테스트 결과 및 전문가 감정서",
+            "손해액 산정 자료 및 손해 발생 증거"
+        ],
+        "potential_difficulties": [
+            "계약서 해석에 대한 양측의 이견",
+            "소프트웨어 하자의 원인에 대한 다툼",
+            "손해액 산정의 객관성 확보"
+        ]
+    },
+    "initial_opinion": {
+        "strengths": [
+            "계약서에 명시된 기한과 실제 완료 시점 간의 명확한 차이",
+            "소프트웨어 하자에 대한 객관적인 증거 확보 가능성"
+        ],
+        "weaknesses": [
+            "개발 기한 연장이나 변경에 대한 증거 부족",
+            "소프트웨어 하자의 원인에 대한 분쟁 가능성"
+        ],
+        "key_considerations": [
+            "계약서의 기한 조항과 실제 이행 내역을 명확히 비교",
+            "소프트웨어 하자에 대한 전문가 감정을 통해 객관적인 증거 확보",
+            "원고의 손해액 산정이 객관적이고 합리적인지 확인"
+        ]
+    }
+}

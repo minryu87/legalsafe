@@ -1,0 +1,93 @@
+Prompt:
+다음 사건을 분석해주세요:
+                    사건 종류: 민사
+                    사건 개요:
+                    
+            계약 위반 및 손해배상 청구 사건
+            원고 A회사는 피고 B회사에 소프트웨어 개발을 의뢰하였으나,
+            피고는 계약상 정해진 기한 내에 개발을 완료하지 못했으며,
+            제공된 소프트웨어에도 심각한 하자가 있었음.
+            이에 원고는 계약 위반에 따른 손해배상을 청구함.
+            
+                    사건 경위:
+                    
+                    다음 항목들을 분석해주세요:
+                    1. 사건의 핵심 쟁점
+                    2. 관련 법령
+                    3. 입증이 필요한 주요 사실
+                    4. 법적 분석 및 검토 의견
+출력 형식은 다음과 같아야 합니다:
+{"key_issues": [{"issue": "string", "description": "string", "relevant_laws": ["string"], "required_evidence": ["string"]}], "legal_analysis": {"main_points": ["string"], "potential_challenges": ["string"], "recommended_focus": "string"}, "evidence_requirements": {"critical_facts": ["string"], "suggested_evidence": ["string"], "potential_difficulties": ["string"]}, "initial_opinion": {"strengths": ["string"], "weaknesses": ["string"], "key_considerations": ["string"]}}
+
+Response:
+```json
+{
+  "key_issues": [
+    {
+      "issue": "계약 위반",
+      "description": "피고 B회사가 소프트웨어 개발 계약을 정해진 기한 내에 완료하지 못함.",
+      "relevant_laws": ["민법 제390조(채무불이행과 손해배상)"],
+      "required_evidence": ["계약서", "프로젝트 일정표", "완료 기한 관련 서류"]
+    },
+    {
+      "issue": "제공된 소프트웨어의 하자",
+      "description": "피고가 제공한 소프트웨어에 심각한 하자가 존재함.",
+      "relevant_laws": ["민법 제389조(채무불이행의 종류)", "민법 제582조(물건의 하자담보책임)"],
+      "required_evidence": ["소프트웨어 품질 검사 보고서", "사용자 불만 사항 기록", "전문가 감정서"]
+    },
+    {
+      "issue": "손해배상 청구",
+      "description": "원고 A회사가 계약 위반으로 인해 입은 손해에 대한 배상을 청구함.",
+      "relevant_laws": ["민법 제393조(손해배상의 범위)", "민법 제394조(손해배상의 방법)"],
+      "required_evidence": ["손해액 산정 관련 서류", "계약 위반으로 인한 손해 입증 자료"]
+    }
+  ],
+  "legal_analysis": {
+    "main_points": [
+      "피고의 계약 위반 사실 입증",
+      "제공된 소프트웨어의 하자 존재 여부 및 그로 인한 손해 입증",
+      "계약 위반과 손해 발생 간의 인과관계 입증"
+    ],
+    "potential_challenges": [
+      "계약서 상의 불명확한 조항",
+      "소프트웨어의 하자 여부에 대한 객관적 판단",
+      "손해액 산정의 정확성"
+    ],
+    "recommended_focus": "계약서 내용의 명확한 분석 및 피고의 의무 불이행 입증"
+  },
+  "evidence_requirements": {
+    "critical_facts": [
+      "계약서 내용",
+      "개발 완료 기한",
+      "소프트웨어 하자 여부",
+      "손해 발생 및 그 규모"
+    ],
+    "suggested_evidence": [
+      "계약서 원본",
+      "프로젝트 진행 기록",
+      "소프트웨어 검사 보고서",
+      "손해액 산정 자료 및 관련 서류"
+    ],
+    "potential_difficulties": [
+      "계약서 상의 불명확한 조항으로 인한 해석 문제",
+      "소프트웨어 하자 입증의 어려움",
+      "손해액 산정의 복잡성"
+    ]
+  },
+  "initial_opinion": {
+    "strengths": [
+      "계약서에 명시된 기한과 의무 사항",
+      "소프트웨어의 명확한 하자 존재"
+    ],
+    "weaknesses": [
+      "손해액 산정의 어려움",
+      "계약서 상의 불명확한 조항으로 인한 해석 문제"
+    ],
+    "key_considerations": [
+      "계약서 내용의 명확한 해석",
+      "소프트웨어 하자에 대한 객관적 증거 확보",
+      "손해액 산정을 위한 구체적이고 명확한 자료 준비"
+    ]
+  }
+}
+```
