@@ -124,7 +124,7 @@ class LegalAnalysisInterface:
                 options=["민사", "형사"],
                 help="사건의 유형을 선택해주세요.",
                 key="case_type",
-                value=st.session_state.case_data.get("case_type", "민사")
+                index=0 if st.session_state.case_data.get("case_type", "민사") == "민사" else 1
             )
             
             # 당사자 정보
