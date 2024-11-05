@@ -329,19 +329,22 @@ class LegalAnalysisInterface:
                     key=f"opinion_{i}",
                     help="해당 쟁점에 대한 귀하의 의견을 작성해주세요."
                 )
-                
-                if st.form_submit_button("🗑 쟁점 삭제", key=f"delete_issue_{i}"):
-                    if len(st.session_state.legal_issues) > 1:
-                        st.session_state.legal_issues.pop(i)
+
+            # 버튼들을 컬럼으로 배치
+            col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+            
+            with col1:
+                if st.form_submit_button("➕ 쟁점 추가"):
+                    st.session_state.legal_issues.append({})
+                    st.rerun()
+                    
+            with col2:
+                if len(st.session_state.legal_issues) > 1:
+                    if st.form_submit_button("🗑 마지막 쟁점 삭제"):
+                        st.session_state.legal_issues.pop()
                         st.rerun()
 
-            if st.form_submit_button("➕ 쟁점 추가"):
-                st.session_state.legal_issues.append({})
-                st.rerun()
-
-            # 저장 및 다음 단계 버튼
-            col_save, col_next = st.columns([1, 1])
-            with col_save:
+            with col3:
                 if st.form_submit_button("💾 저장"):
                     legal_issues = [
                         {
@@ -361,7 +364,7 @@ class LegalAnalysisInterface:
                             st.session_state.cases_list[i] = st.session_state.case_data.copy()
                     st.success("저장되었습니다!")
 
-            with col_next:
+            with col4:
                 if st.form_submit_button("다음 단계로 ▶"):
                     legal_issues = [
                         {
@@ -377,6 +380,7 @@ class LegalAnalysisInterface:
                     })
                     st.session_state.current_step = 4
                     st.rerun()
+
     def show_evidence_form(self):
         """증거 관련 정보 입력 폼"""
         st.header("4. 증거 관련 정보")
