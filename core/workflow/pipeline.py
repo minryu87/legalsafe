@@ -7,7 +7,9 @@ import logging
 from enum import Enum
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 from core.workflow.coordinator import AgentCoordinator, WorkflowState
 from config.azure_config import MODEL_CONFIG
 
@@ -518,3 +520,37 @@ class LegalAnalysisPipeline:
                 "증거 평가 프레임워크"
             ]
         }
+    def _prioritize_issues(self, processed_data: Dict, priority_issues: List[str]) -> None:
+        """이슈 우선순위 설정"""
+        try:
+            prioritized_issues = []
+            for priority in priority_issues:
+                for issue in processed_data.get("legal_issues", []):
+                    if priority.lower() in issue.get("issue", "").lower():
+                        prioritized_issues.append(issue)
+            
+            # 우선순위가 없는 이슈들은 뒤에 추가
+            for issue in processed_data.get("legal_issues", []):
+                if issue not in prioritized_issues:
+                    prioritized_issues.append(issue)
+            
+            processed_data["legal_issues"] = prioritized_issues
+        except Exception as e:
+            self.logger.error(f"Error prioritizing issues: {str(e)}")
+    def _process_metadata(self, processing_result: Dict) -> Dict:
+        """메타데이터 처리"""
+        try:
+            return {
+                "generated_at": datetime.now().isoformat(),
+                "processing_duration": str(datetime.now() - self.start_time),
+                "pipeline_version": "1.0.0",
+                "workflow_state": self.coordinator.get_current_state(),
+                "execution_history": self.execution_history[-10:],  # 최근 10개 이벤트만
+                "status": self.status.value
+            }
+        except Exception as e:
+            self.logger.error(f"Error processing metadata: {str(e)}")
+            return {
+                "generated_at": datetime.now().isoformat(),
+                "error": str(e)
+            }

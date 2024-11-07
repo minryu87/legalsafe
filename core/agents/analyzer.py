@@ -5,9 +5,9 @@ import logging
 from .base import BaseAgent, AgentRole
 from ..utils.azure_gpt import AzureGPTClient
 
-class CaseAnalyzer(BaseAgent):
-    def __init__(self):
-        super().__init__(AgentRole.ANALYZER, "Case Analyzer")
+class LegalAnalyzer(BaseAgent):
+    def __init__(self, name: str = "법률분석가"):
+        super().__init__(AgentRole.ANALYZER, name)
         self.gpt_client = AzureGPTClient()
         self.logger = logging.getLogger(self.__class__.__name__)
         
@@ -38,17 +38,44 @@ class CaseAnalyzer(BaseAgent):
                 for event in timeline
             ])
         
-        return f"""다음 사건을 분석해주세요(한글로 제공하세요):
-                    사건 종류: {case_type}
-                    사건 개요:
-                    {case_summary}
-                    사건 경위:
-                    {timeline_str if timeline_str else '타임라인 정보 없음'}
-                    다음 항목들을 분석해주세요:
-                    1. 사건의 핵심 쟁점
-                    2. 관련 법령
-                    3. 입증이 필요한 주요 사실
-                    4. 법적 분석 및 검토 의견"""
+        return f"""다음 사건을 분석하고 JSON 형식으로 결과를 제공합니다(한글로 작성하세요):
+
+    사건 종류: {case_type}
+    사건 개요:
+    {case_summary}
+    사건 경위:
+    {timeline_str if timeline_str else '타임라인 정보 없음'}
+
+    요청되는 결과 형식:
+    {{
+    "summary": "사건 요약 내용",
+    "key_issues": [
+        {{
+        "issue": "string",
+        "description": "string",
+        "relevant_laws": ["string"],
+        "required_evidence": ["string"]
+        }}
+    ],
+    "legal_analysis": {{
+        "main_points": ["string"],
+        "potential_challenges": ["string"],
+        "recommended_focus": "string"
+    }},
+    "evidence_requirements": {{
+        "critical_facts": ["string"],
+        "suggested_evidence": ["string"],
+        "potential_difficulties": ["string"]
+    }},
+    "initial_opinion": {{
+        "strengths": ["string"],
+        "weaknesses": ["string"],
+        "key_considerations": ["string"]
+    }}
+    }}
+
+    각 필드에 적절한 내용을 채워주세요.
+    """
         
     def get_output_format(self) -> Dict:
         return {
@@ -77,58 +104,33 @@ class CaseAnalyzer(BaseAgent):
             }
         }
 
-    async def process(self, input_data: Dict) -> Optional[Dict]:
+    async def process(self, input_data: Dict) -> Dict:
         """사건 분석 수행"""
         try:
             self.logger.info("Starting case analysis")
             
-            if not input_data:
-                self.logger.error("Empty input data received")
-                return None
-
-            # 입력 데이터 로깅
-            self.logger.debug(f"Processing input data: {json.dumps(input_data, ensure_ascii=False, indent=2)}")
-
-            # GPT 응답 생성
-            system_prompt = self.prepare_system_prompt()
-            user_prompt = self.prepare_user_prompt(input_data)
-            output_format = self.get_output_format()
-            
-            self.logger.debug(f"Sending request to GPT with system prompt: {system_prompt[:100]}...")
-            self.logger.debug(f"User prompt: {user_prompt[:100]}...")
-            
-            response = await self.gpt_client.generate_structured_response(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                output_format=output_format
+            # generate_completion 대신 generate_structured_response 사용
+            analysis_result = await self.gpt_client.generate_structured_response(
+                system_prompt=self.prepare_system_prompt(),
+                user_prompt=json.dumps(input_data, ensure_ascii=False),
+                output_format={
+                    "summary": "사건 요약 내용",  # summary 추가
+                    "key_issues": [],
+                    "legal_analysis": {},
+                    "evidence_requirements": {},
+                    "initial_opinion": {}
+                }
             )
             
-            self.logger.debug(f"Raw GPT response: {json.dumps(response, ensure_ascii=False, indent=2)}")
-            
-            if response is None:
-                self.logger.error("Received null response from GPT")
-                return None
-
-            # 응답 검증
-            if not self.validate_response(response):
-                self.logger.error("Response validation failed")
-                self.logger.debug(f"Invalid response structure: {json.dumps(response, ensure_ascii=False, indent=2)}")
-                return None
-
-            # 결과 포맷팅
-            formatted_result = self.format_output(response)
-            if formatted_result is None:
-                self.logger.error("Failed to format output")
-                return None
+            if not analysis_result:
+                raise ValueError("Analysis failed - no result returned")
                 
             self.logger.info("Case analysis completed successfully")
-            self.logger.debug(f"Final formatted result: {json.dumps(formatted_result, ensure_ascii=False, indent=2)}")
-            
-            return formatted_result
+            return analysis_result
             
         except Exception as e:
-            self.logger.error(f"Error in case analysis: {str(e)}", exc_info=True)
-            return None
+            self.logger.error("Analysis failed", exc_info=True)
+            raise
 
     def validate_response(self, response: dict) -> bool:
         """응답 유효성 검증 및 세부 오류 로깅"""

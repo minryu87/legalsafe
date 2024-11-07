@@ -98,13 +98,12 @@ class TestIntegration:
         """보고서 생성 테스트"""
         reporter = LegalReporter()
 
-        # 분석 결과를 모의 데이터로 설정 (실제 구조에 맞게 수정 필요)
+        # 분석 결과를 모의 데이터로 설정
         analysis_results = {
             "key_issues": [...],  # 필요한 데이터 입력
             "legal_analysis": {...},
             "evidence_requirements": {...},
             "initial_opinion": {...},
-            # 추가적으로 필요한 필드들...
         }
 
         # 1. 상세 보고서 테스트
@@ -116,6 +115,11 @@ class TestIntegration:
         assert "sections" in detailed_report
         assert "metadata" in detailed_report
         
+        # 상세 보고서의 주요 섹션 검증
+        assert "executive_summary" in detailed_report["sections"]
+        assert "case_analysis" in detailed_report["sections"]
+        assert "strategy_recommendations" in detailed_report["sections"]
+        
         # 2. 요약 보고서 테스트
         concise_report = reporter.generate_report(
             sample_case_data, 
@@ -125,7 +129,13 @@ class TestIntegration:
         assert "summary" in concise_report
         assert "key_recommendations" in concise_report
         
-        return detailed_report, concise_report
+        # 요약 보고서의 주요 내용 검증
+        assert "case_overview" in concise_report["summary"]
+        assert "main_approach" in concise_report["key_recommendations"]
+        
+        # 날짜 메타데이터 검증
+        assert "generated_at" in detailed_report["metadata"]
+        assert "generated_at" in concise_report["metadata"]
 
     @pytest.mark.asyncio
     async def test_error_handling(self, pipeline):

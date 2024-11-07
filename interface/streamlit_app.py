@@ -24,6 +24,14 @@ from config.azure_config import MODEL_CONFIG
 from core.utils.azure_gpt import AzureGPTClient
 from core.utils.storage import load_cases, save_cases
 
+from core.agents.analyzer import LegalAnalyzer
+from core.agents.researcher import LegalResearcher
+from core.agents.strategist import LegalStrategist
+
+
+
+
+
 class LegalAnalysisInterface:
     def __init__(self):
         self.initialize_session_state()
@@ -510,25 +518,17 @@ class LegalAnalysisInterface:
                     progress_bar.progress(progress)
                     
                     # 판례 검색 단계일 때 특별한 프롬프트 사용
+                    # in streamlit_app.py
                     if "판례 검색" in stage:
                         system_prompt = """당신은 대한민국의 법률 전문가이며 판례 연구원입니다.
-                        실제 존재하는 대법원 및 하급심 판례만을 인용해야 합니다.
-                        판례번호는 반드시 실제 존재하는 판례번호를 정확하게 기재해야 합니다.
-                        응답은 다음 구조를 반드시 포함해야 합니다:
-                        1. 관련된 주요 판례들의 요지 (판례번호 포함)
-                        2. 판례에서 나타난 법원의 판단 기준
-                        3. 본 사건과의 유사점과 차이점
-                        4. 예상되는 법원의 판단 방향
-                        5. 특별히 참고해야 할 법리나 판시사항"""
+                        제공된 실제 판례들을 분석하고, 각 판례가 현재 사건에 어떤 시사점을 주는지 설명해주세요."""
 
-                        user_prompt = f"""다음 사건의 관련 판례를 검색하여 분석해주세요:
-                        사건 종류: {st.session_state.case_data.get('case_type')}
-                        사실관계: {st.session_state.case_data.get('case_summary')}
-                        법적 쟁점: {json.dumps(st.session_state.case_data.get('legal_issues'), ensure_ascii=False, indent=2)}
+                        researcher = LegalResearcher()
+                        search_results = researcher.prepare_user_prompt(st.session_state.case_data)
                         
-                        실제 존재하는 판례만을 인용하되, 최근 10년 이내의 판례를 우선적으로 검토해주세요.
-                        각 판례의 판례번호를 정확히 기재해주세요."""
-                    
+                        user_prompt = f"""다음 검색된 판례들을 분석해주세요:
+                        {search_results}"""
+                                        
                     else:
                         # 기존 프롬프트 사용
                         system_prompt = """당신은 법률 분석 전문가입니다. 

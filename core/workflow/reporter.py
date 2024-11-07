@@ -240,12 +240,20 @@ class LegalReporter:
         """주요 위험 요소 추출"""
         try:
             risk_analysis = self.report_sections[ReportSection.RISK_ANALYSIS]
+            legal_risks = risk_analysis.get("legal_risks", [])
+            procedural_risks = risk_analysis.get("procedural_risks", [])
+            
             critical_risks = []
-            for risk_type, risks in risk_analysis.items():
-                if isinstance(risks, list):
-                    critical_risks.extend(risks)
-                elif isinstance(risks, dict) and "high_priority_risks" in risks:
-                    critical_risks.extend(risks["high_priority_risks"])
+            # 법적 위험 중 심각도가 높은 것들
+            for risk in legal_risks:
+                if isinstance(risk, dict) and risk.get("severity") == "high":
+                    critical_risks.append(risk["risk"])
+
+            # 절차적 위험 중 심각도가 높은 것들
+            for risk in procedural_risks:
+                if isinstance(risk, dict) and risk.get("severity") == "high":
+                    critical_risks.append(risk["risk"])
+                    
             return critical_risks
         except Exception as e:
             self.logger.error(f"Error extracting critical risks: {e}")
@@ -689,4 +697,22 @@ class LegalReporter:
                 "판례 데이터베이스",
                 "증거 평가 프레임워크"
             ]
+        }
+    def _handle_error(self, error: Exception, context: str) -> None:
+        """에러 처리 통일"""
+        error_msg = f"Error in {context}: {str(error)}"
+        self.logger.error(error_msg, exc_info=True)
+    
+    def _generate_metadata(self) -> Dict:
+        """메타데이터 생성"""
+        return {
+            "generated_at": datetime.now().isoformat(),
+            "version": "1.0.0",
+            "report_format": self.report_format.value if hasattr(self, 'report_format') else None,
+            "sections_included": list(self.report_sections.keys()),
+            "generation_stats": {
+                "total_sections": len(self.report_sections),
+                "risks_identified": len(self._extract_critical_risks()),
+                "actions_recommended": len(self._extract_next_steps())
+            }
         }

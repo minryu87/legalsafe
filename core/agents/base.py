@@ -7,7 +7,10 @@ import json
 import logging
 import sys
 import os
+from abc import ABC, abstractmethod
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 from core.utils.azure_gpt import AzureGPTClient
 from config.azure_config import MODEL_CONFIG
 
@@ -63,57 +66,42 @@ class BaseAgent:
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
         
-    def process(self, input_data: Dict) -> Dict:
-        """에이전트의 주요 처리 로직"""
+    # BaseAgent의 process 메서드 수정
+    async def process(self, input_data: Dict) -> Dict:
         try:
-            self.logger.info(f"Starting processing with role: {self.role.value}")
-            self.state = AgentState.WORKING
-            
-            # 입력 데이터 로깅
-            self.logger.debug(f"Input data: {json.dumps(input_data, indent=2)}")
-            
+            self.logger.info(f"Starting processing with role: {self.role}")
+            self.logger.debug(f"Input data: {json.dumps(input_data, ensure_ascii=False)}")
+
             # 시스템 프롬프트 준비
             system_prompt = self.prepare_system_prompt()
-            self.logger.debug(f"System prompt: {system_prompt}")
-            
-            # 입력 데이터를 바탕으로 사용자 프롬프트 생성
+            if not system_prompt:
+                raise ValueError("System prompt is not prepared")
+
+            # 사용자 프롬프트 준비
             user_prompt = self.prepare_user_prompt(input_data)
-            self.logger.debug(f"User prompt: {user_prompt}")
-            
+            if not user_prompt:
+                raise ValueError("User prompt is not prepared")
+
             # GPT 응답 생성
-            for attempt in range(self.max_retries):
-                try:
-                    response = self.gpt_client.generate_structured_response(
-                        system_prompt=system_prompt,
-                        user_prompt=user_prompt,
-                        output_format=self.get_output_format()
-                    )
-                    
-                    # 응답 로깅
-                    self.logger.debug(f"GPT response: {json.dumps(response, indent=2)}")
-                    
-                    # 응답 처리 및 검증
-                    if response and self.validate_response(response):
-                        self.work_results = response
-                        self.state = AgentState.COMPLETED
-                        formatted_output = self.format_output(response)
-                        self.logger.info("Processing completed successfully")
-                        return formatted_output
-                    
-                    self.logger.warning(f"Attempt {attempt + 1} failed validation")
-                    
-                except Exception as e:
-                    self.logger.error(f"Attempt {attempt + 1} failed: {str(e)}")
-                    if attempt == self.max_retries - 1:
-                        raise
-            
-            self.state = AgentState.ERROR
-            return {"error": "Failed to generate valid response after max retries"}
-            
+            result = await self.gpt_client.generate_structured_response(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                output_format=self.get_output_format()
+            )
+
+            if not result:
+                raise ValueError("No result generated")
+
+            # 결과 검증
+            if not self.validate_result(result):
+                raise ValueError("Invalid result format")
+
+            return result
+
         except Exception as e:
-            self.logger.error(f"Processing failed: {str(e)}", exc_info=True)
-            self.state = AgentState.ERROR
-            return {"error": str(e)}
+            self.logger.error("Processing failed:", exc_info=True)
+            raise
+
 
     def prepare_system_prompt(self) -> str:
         """시스템 프롬프트 준비 - 하위 클래스에서 구현"""
@@ -124,8 +112,13 @@ class BaseAgent:
         raise NotImplementedError
         
     def get_output_format(self) -> Dict:
-        """출력 형식 정의 - 하위 클래스에서 구현"""
-        raise NotImplementedError
+        """출력 형식 정의"""
+        return {
+            "analysis": "string",
+            "recommendations": ["string"],
+            "risks": ["string"],
+            "next_steps": ["string"]
+        }
         
     def validate_response(self, response: Dict) -> bool:
         """응답 유효성 검증 - 하위 클래스에서 구현"""
@@ -159,6 +152,16 @@ class BaseAgent:
         self.state = AgentState.IDLE
         self.conversation_history = []
         self.work_results = {}
+
+    def validate_result(self, result: Dict) -> bool:
+        """결과 검증"""
+        required_keys = [
+            'analysis',
+            'recommendations',
+            'risks',
+            'next_steps'
+        ]
+        return all(key in result for key in required_keys)
 
 class AgentException(Exception):
     """에이전트 관련 예외"""
